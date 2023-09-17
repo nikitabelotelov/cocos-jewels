@@ -1,5 +1,6 @@
-import { _decorator, Animation, AnimationClip, Component, instantiate, Node, Prefab, tween, Vec3 } from 'cc';
+import { _decorator, Animation, AnimationClip, Component, find, instantiate, Node, Prefab, tween, Vec3 } from 'cc';
 import { JewelsMatrix, TMatrixDiff } from './JewelsMatrix';
+import { ConfigController } from './ConfigController';
 const { ccclass, property } = _decorator;
 
 const SPRITE_SIZE = 64
@@ -17,6 +18,9 @@ export class GameController extends Component {
     private jewelNodes: { onPop: () => void, node: Node }[][] = [];
 
     start() {
+        const configController = find('ConfigController').getComponent<ConfigController>(ConfigController)
+        this.H = configController.getHeight()
+        this.W = configController.getWidth()
         this.jewelMatrix = new JewelsMatrix(this.H, this.W, this.jewels.length, this.jewels.length);
         this.createMatrix();
     }
@@ -34,10 +38,7 @@ export class GameController extends Component {
                 node.setPosition(this.getJewelPosition(i, j))
                 this.jewelNodes[i][j] = {
                     node: node,
-                    onPop: () => {
-                        const diff = this.jewelMatrix.popJewel(i, j)
-                        this.updateMatrix(diff)
-                    }
+                    onPop: this.getJewelPopHandler(i, j)
                 }
                 node.on(Node.EventType.MOUSE_DOWN, this.jewelNodes[i][j].onPop)
                 this.node.addChild(node)
@@ -51,7 +52,7 @@ export class GameController extends Component {
         })
         diff.moved.forEach((el) => {
             const node = this.jewelNodes[el.from[0]][el.from[1]].node
-            tween(node).to(0.5, { position: this.getJewelPosition(el.to[0], el.to[1]) }).start()
+            tween(node).to(0.5, { position: this.getJewelPosition(el.to[0], el.to[1]) }, { easing: "cubicIn" }).start()
             this.jewelNodes[el.to[0]][el.to[1]].node = node
             this.jewelNodes[el.to[0]][el.to[1]].onPop = this.getJewelPopHandler(el.to[0], el.to[1])
             node.off(Node.EventType.MOUSE_DOWN, this.jewelNodes[el.from[0]][el.from[1]].onPop)
@@ -61,7 +62,7 @@ export class GameController extends Component {
             addedJewels.forEach((addedJewel, i) => {
                 const node = instantiate(this.jewels[addedJewel.color])
                 node.setPosition(this.getJewelPosition(-addedJewels.length + i, addedJewel.col))
-                tween(node).to(0.5, { position: this.getJewelPosition(addedJewel.row, addedJewel.col) }).start()
+                tween(node).to(0.5, { position: this.getJewelPosition(addedJewel.row, addedJewel.col) }, { easing: "cubicIn" }).start()
                 this.jewelNodes[addedJewel.row][addedJewel.col].onPop = this.getJewelPopHandler(addedJewel.row, addedJewel.col)
                 node.on(Node.EventType.MOUSE_DOWN, this.jewelNodes[addedJewel.row][addedJewel.col].onPop)
                 this.jewelNodes[addedJewel.row][addedJewel.col].node = node;
