@@ -89,10 +89,10 @@ export class JewelsMatrix {
     const connected = this.getConnected(row, col);
     return connected.length >= this.minConnected;
   }
-  public popJewel(row: number, col: number): TMatrixDiff | undefined {
+  public popJewel(row: number, col: number): TMatrixDiff | null {
     const connected = this.getConnected(row, col);
     if (connected.length < this.minConnected) {
-      return;
+      return null;
     }
     for (let [r, c] of connected) {
       this.matrix[r][c] = NULL_VALUE;
@@ -155,5 +155,43 @@ export class JewelsMatrix {
   }
   public getMatrix(): number[][] {
     return this.matrix;
+  }
+  public isSolvable(): boolean {
+    for (let i = 0; i < this.height; i++) {
+      for (let j = 0; j < this.width; j++) {
+        if(this.canPop(i, j)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  public shuffle(): TMatrixDiff {
+    const nodes: { coords: [number, number], color: number }[] = []
+    for (let i = 0; i < this.height; i++) {
+      for (let j = 0; j < this.width; j++) {
+        nodes.push({
+          coords: [i, j],
+          color: this.matrix[i][j]
+        })
+      }
+    }
+    nodes.sort(() => Math.random() - 0.5)
+    const moved: TMovedJewel[] = []
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      const newRow = Math.floor(i / this.width)
+      const newCol = i % this.width
+      this.matrix[newRow][newCol] = node.color
+      moved.push({
+        from: node.coords,
+        to: [newRow, newCol]
+      })
+    }
+    return {
+      poped: [],
+      added: [],
+      moved
+    }
   }
 }
