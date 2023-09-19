@@ -5,6 +5,12 @@ const { ccclass, property } = _decorator;
 export class GameController extends Component {
     @property(EditBox)
     protected editBox: EditBox = null;
+    @property(Number)
+    protected movesNumber: number = 15;
+    @property(Number)
+    protected pointsToWin: number = 300;
+    @property(Number)
+    protected colorNumber: number = 5;
 
     private count: number = 0;
 
@@ -20,7 +26,13 @@ export class GameController extends Component {
         const calculatedPoints = (1 + points) * points / 2;
         this.count += calculatedPoints;
         this.editBox.string = this.count.toString();
+        this.checkIfWin();
     }
 
+    private checkIfWin(): void {
+        if (this.count >= this.pointsToWin) {
+            console.log('You win!');
+        }
+    }
 }
 

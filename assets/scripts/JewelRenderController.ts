@@ -76,7 +76,9 @@ export class JewelRenderController extends Component {
         const oldJewelNodes = this.jewelNodes
         const newJewelNodes = this.copyJewelNodes()
         diff.poped.forEach(([row, col]) => {
-            oldJewelNodes[row][col].node.destroy()
+            promises.push(this.tweenJewelPop(oldJewelNodes[row][col].node).then(() => {
+                oldJewelNodes[row][col].node.destroy()
+            }))
         })
         diff.moved.forEach((el) => {
             const node = oldJewelNodes[el.from[0]][el.from[1]].node
@@ -116,6 +118,15 @@ export class JewelRenderController extends Component {
         return new Promise(resolve => {
             tween(node)
                 .to(0.5, { position: this.getJewelPosition(row, col) }, { easing: "cubicIn" })
+                .call(resolve)
+                .start()
+        })
+    }
+
+    private tweenJewelPop(node: Node): Promise<void> {
+        return new Promise(resolve => {
+            tween(node)
+                .to(0.3, { scale: new Vec3(0, 0, 0) })
                 .call(resolve)
                 .start()
         })
