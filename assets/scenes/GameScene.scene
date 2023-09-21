@@ -74,7 +74,7 @@
         "__id__": 5
       },
       {
-        "__id__": 8
+        "__id__": 7
       },
       {
         "__id__": 11
@@ -268,37 +268,29 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "H": 9,
-    "W": 9,
     "jewels": [
       {
-        "__uuid__": "e5627ac8-e279-4191-af93-c81874e184ea",
+        "__uuid__": "8dc8adc2-b325-49ce-af6f-83601b6b99eb",
         "__expectedType__": "cc.Prefab"
       },
       {
-        "__uuid__": "0ff2f267-b055-48dc-89b3-3c2e224279bb",
+        "__uuid__": "2278b432-c94e-4a8d-b8e8-03e6e6fc6f9a",
+        "__expectedType__": "cc.Prefab"
+      },
+      {
+        "__uuid__": "2779aecf-9241-4784-a28d-17988692ab33",
+        "__expectedType__": "cc.Prefab"
+      },
+      {
+        "__uuid__": "a42692ae-62d2-4595-803b-b81e137946c7",
+        "__expectedType__": "cc.Prefab"
+      },
+      {
+        "__uuid__": "86fc2a20-7a53-4ffe-bd49-bdcfacf40088",
         "__expectedType__": "cc.Prefab"
       }
     ],
-    "gameController": {
-      "__id__": 7
-    },
     "_id": "72KB5WrK5NHYWL1MaOW5jH"
-  },
-  {
-    "__type__": "424cdjJc9tKnIakdKuod5+K",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 8
-    },
-    "_enabled": true,
-    "__prefab": null,
-    "editBox": {
-      "__id__": 10
-    },
-    "_id": "627HAUdjtEmYvCsA2QjMPk"
   },
   {
     "__type__": "cc.Node",
@@ -312,10 +304,10 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 9
+        "__id__": 8
       },
       {
-        "__id__": 7
+        "__id__": 9
       }
     ],
     "_prefab": null,
@@ -354,7 +346,7 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 8
+      "__id__": 7
     },
     "_enabled": true,
     "__prefab": null,
@@ -369,6 +361,28 @@
       "y": 0.5
     },
     "_id": "2cCt3r0RtBOq8d6tvv/8hc"
+  },
+  {
+    "__type__": "424cdjJc9tKnIakdKuod5+K",
+    "_name": "",
+    "_objFlags": 0,
+    "__editorExtras__": {},
+    "node": {
+      "__id__": 7
+    },
+    "_enabled": true,
+    "__prefab": null,
+    "jewelRenderController": {
+      "__id__": 6
+    },
+    "editBox": {
+      "__id__": 10
+    },
+    "movesNumber": 15,
+    "pointsToWin": 300,
+    "colorNumber": 5,
+    "shuffleCount": 2,
+    "_id": "627HAUdjtEmYvCsA2QjMPk"
   },
   {
     "__type__": "cc.EditBox",
@@ -553,14 +567,17 @@
     "_string": "0",
     "_horizontalAlign": 0,
     "_verticalAlign": 1,
-    "_actualFontSize": 26.924999999999997,
-    "_fontSize": 24,
+    "_actualFontSize": 33.65625,
+    "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
     "_overflow": 1,
     "_enableWrapText": false,
-    "_font": null,
-    "_isSystemFontUsed": true,
+    "_font": {
+      "__uuid__": "c17c61d0-a36d-46a5-9331-64683cb0986c",
+      "__expectedType__": "cc.TTFFont"
+    },
+    "_isSystemFontUsed": false,
     "_spacingX": 0,
     "_isItalic": false,
     "_isBold": true,
@@ -715,8 +732,8 @@
     "_dstBlendFactor": 4,
     "_color": {
       "__type__": "cc.Color",
-      "r": 255,
-      "g": 255,
+      "r": 252,
+      "g": 190,
       "b": 255,
       "a": 255
     },

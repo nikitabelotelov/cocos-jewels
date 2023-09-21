@@ -1,11 +1,9 @@
-import { _decorator, Animation, AnimationClip, Component, find, instantiate, Node, Prefab, tween, Vec3 } from 'cc';
-import { JewelsMatrix, TMatrixDiff } from './JewelsMatrix';
-import { ConfigController } from './ConfigController';
-import { GameController } from './GameController';
-const { ccclass, property } = _decorator;
+import { _decorator, Animation, AnimationClip, Component, find, instantiate, Node, Prefab, tween, Vec3 } from 'cc'
+import { JewelsMatrix, TMatrixDiff } from './JewelsMatrix'
+import { GameController } from './GameController'
+const { ccclass, property } = _decorator
 
 const SPRITE_SIZE = 64
-const MIN_CONNECTED = 2
 
 type TJewelNode = {
     onPop: () => void,
@@ -14,51 +12,44 @@ type TJewelNode = {
 
 @ccclass('JewelRenderController')
 export class JewelRenderController extends Component {
-    @property(Number)
     protected H: number = 9
-    @property(Number)
     protected W: number = 5
-    protected shuffleCount: number = 2
     @property(Prefab)
-    protected jewels: Prefab[] = [];
-    @property(GameController)
-    protected gameController: GameController = null;
+    protected jewels: Prefab[] = []
+    protected gameController: GameController = null
 
-    private jewelMatrix: JewelsMatrix;
-    private jewelNodes: TJewelNode[][] = [];
+    private jewelNodes: TJewelNode[][] = []
 
-    start() {
-        const configController = find('ConfigController').getComponent<ConfigController>(ConfigController)
-        this.H = configController.getHeight()
-        this.W = configController.getWidth()
-        this.jewelMatrix = new JewelsMatrix(this.H, this.W, this.jewels.length, MIN_CONNECTED);
-        this.createMatrix();
+    public init(gameController: GameController, jewelMatrix: number[][], h: number, w: number) {
+        this.H = h
+        this.W = w
+        this.gameController = gameController
+        this.createMatrix(jewelMatrix)
     }
 
     private getEmptyJewelNodes() {
-        const jewelNodes: TJewelNode[][] = [];
+        const jewelNodes: TJewelNode[][] = []
         for (let i = 0; i < this.H; i++) {
-            jewelNodes[i] = [];
+            jewelNodes[i] = []
         }
-        return jewelNodes;
+        return jewelNodes
     }
 
     private copyJewelNodes() {
-        const jewelNodes = this.getEmptyJewelNodes();
+        const jewelNodes = this.getEmptyJewelNodes()
         for (let i = 0; i < this.H; i++) {
             for (let j = 0; j < this.W; j++) {
-                jewelNodes[i][j] = this.jewelNodes[i][j];
+                jewelNodes[i][j] = this.jewelNodes[i][j]
             }
         }
-        return jewelNodes;
+        return jewelNodes
     }
 
-    createMatrix() {
-        this.jewelNodes = this.getEmptyJewelNodes();
-        const renderMatrix = this.jewelMatrix.getMatrix();
+    createMatrix(jewelMatrix: number[][]) {
+        this.jewelNodes = this.getEmptyJewelNodes()
         for (let i = this.H - 1; i >= 0; i--) {
             for (let j = 0; j < this.W; j++) {
-                const node = instantiate(this.jewels[renderMatrix[i][j]])
+                const node = instantiate(this.jewels[jewelMatrix[i][j]])
                 node.addComponent(Animation)
                 node.setPosition(this.getJewelPosition(i, j))
                 this.jewelNodes[i][j] = {
@@ -71,7 +62,7 @@ export class JewelRenderController extends Component {
         }
     }
 
-    updateMatrix(diff: TMatrixDiff) {
+    public updateMatrix(diff: TMatrixDiff) {
         const promises: Promise<void>[] = []
         const oldJewelNodes = this.jewelNodes
         const newJewelNodes = this.copyJewelNodes()
@@ -111,7 +102,7 @@ export class JewelRenderController extends Component {
     private getJewelPosition(row: number, col: number) {
         return new Vec3(-(this.W * SPRITE_SIZE) / 2 + SPRITE_SIZE * col + SPRITE_SIZE / 2,
             (this.H * SPRITE_SIZE) / 2 - SPRITE_SIZE * row - SPRITE_SIZE / 2,
-            0);
+            0)
     }
 
     private tweenJewel(node: Node, row: number, col: number): Promise<void> {
@@ -134,20 +125,7 @@ export class JewelRenderController extends Component {
 
     private getJewelPopHandler(row: number, col: number) {
         return async () => {
-            const diff = this.jewelMatrix.popJewel(row, col)
-            if (diff) {
-                this.gameController.addPoints(diff.poped.length)
-                await this.updateMatrix(diff)
-                await this.fixIfNotSolvable();
-            }
-        }
-    }
-
-    private async fixIfNotSolvable() {
-        let count = 0;
-        while (count < this.shuffleCount && !this.jewelMatrix.isSolvable()) {
-            await this.updateMatrix(this.jewelMatrix.shuffle())
-            count++;
+            await this.gameController.popJewel(row, col)
         }
     }
 

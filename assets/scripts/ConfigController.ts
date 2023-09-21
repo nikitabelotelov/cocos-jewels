@@ -7,9 +7,12 @@ export class ConfigController extends Component {
     protected HeightInput: EditBoxComponent | null = null
     @property(EditBoxComponent)
     protected WidthInput: EditBoxComponent | null = null
+    @property(EditBoxComponent)
+    protected ColorsInput: EditBoxComponent | null = null
 
     private height: number = 9
     private width: number = 9
+    private colors: number = 5
     start() {
         director.addPersistRootNode(this.node)
         if (this.HeightInput) {
@@ -19,6 +22,10 @@ export class ConfigController extends Component {
         if (this.WidthInput) {
             this.WidthInput.string = this.width.toString()
             this.WidthInput.node.on(EditBoxComponent.EventType.EDITING_DID_ENDED, this.onWidthInputEnd, this)
+        }
+        if (this.ColorsInput) {
+            this.ColorsInput.string = this.colors.toString()
+            this.ColorsInput.node.on(EditBoxComponent.EventType.EDITING_DID_ENDED, this.onColorsInputEnd, this)
         }
     }
     private onHeightInputEnd() {
@@ -31,6 +38,11 @@ export class ConfigController extends Component {
             this.width = parseInt(this.WidthInput.string)
         }
     }
+    private onColorsInputEnd() {
+        if (this.ColorsInput) {
+            this.colors = parseInt(this.ColorsInput.string)
+        }
+    }
     public startGame() {
         director.loadScene('GameScene')
     }
@@ -40,6 +52,8 @@ export class ConfigController extends Component {
     public getWidth() {
         return this.width
     }
-
+    public getColorNumber() {
+        return this.colors
+    }
 }
 
