@@ -1,5 +1,5 @@
-import { _decorator, Animation, AnimationClip, Component, find, instantiate, Node, Prefab, tween, Vec3 } from 'cc'
-import { JewelsMatrix, TMatrixDiff } from './JewelsMatrix'
+import { _decorator, Animation, AnimationClip, Component, find, instantiate, Node, Prefab, Size, tween, UITransform, Vec3 } from 'cc'
+import { TMatrixDiff } from './JewelsMatrix'
 import { GameController } from './GameController'
 const { ccclass, property } = _decorator
 
@@ -14,17 +14,25 @@ type TJewelNode = {
 export class JewelRenderController extends Component {
     protected H: number = 9
     protected W: number = 5
+    protected gameController: GameController = null
     @property(Prefab)
     protected jewels: Prefab[] = []
-    protected gameController: GameController = null
+    @property(UITransform)
+    protected field: UITransform = null
 
     private jewelNodes: TJewelNode[][] = []
 
     public init(gameController: GameController, jewelMatrix: number[][], h: number, w: number) {
         this.H = h
         this.W = w
+        this.initField()
         this.gameController = gameController
         this.createMatrix(jewelMatrix)
+    }
+
+    private initField() {
+        this.field.getComponent(UITransform)
+            .setContentSize(new Size(this.H * SPRITE_SIZE + 32, this.W * SPRITE_SIZE + 32))
     }
 
     private getEmptyJewelNodes() {
@@ -136,10 +144,6 @@ export class JewelRenderController extends Component {
                 this.node.addChild(this.jewelNodes[i][j].node)
             }
         }
-    }
-
-    update(deltaTime: number) {
-
     }
 }
 
