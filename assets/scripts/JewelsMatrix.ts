@@ -97,7 +97,7 @@ export class JewelsMatrix {
     for (let [r, c] of connected) {
       this.matrix[r][c] = NULL_VALUE;
     }
-    const moved =this.moveJewelsDown();
+    const moved = this.moveJewelsDown();
     const added = this.fillGaps();
     return {
       poped: connected,
@@ -150,6 +150,29 @@ export class JewelsMatrix {
     }
     return added;
   }
+  public popInRadius(row: number, column: number, radius: number): TMatrixDiff {
+    const poped: [number, number][] = []
+    const fromColumn = Math.max(0, column - radius)
+    const toColumn = Math.min(this.width - 1, column + radius)
+    const fromRow = Math.max(0, row - radius)
+    const toRow = Math.min(this.height - 1, row + radius)
+    for (let i = fromRow; i <= toRow; i++) {
+      for (let j = fromColumn; j <= toColumn; j++) {
+        const currentRadius = Math.sqrt(Math.pow(column - j, 2) + Math.pow(row - i, 2))
+        if (currentRadius <= radius) {
+          this.matrix[i][j] = NULL_VALUE
+          poped.push([i, j])
+        }
+      }
+    }
+    const moved = this.moveJewelsDown();
+    const added = this.fillGaps();
+    return {
+      poped,
+      moved,
+      added
+    }
+  }
   private getRandomColor(): number {
     return Math.floor(Math.random() * this.colors);
   }
@@ -159,7 +182,7 @@ export class JewelsMatrix {
   public isSolvable(): boolean {
     for (let i = 0; i < this.height; i++) {
       for (let j = 0; j < this.width; j++) {
-        if(this.canPop(i, j)) {
+        if (this.canPop(i, j)) {
           return true;
         }
       }

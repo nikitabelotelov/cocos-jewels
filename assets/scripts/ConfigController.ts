@@ -1,6 +1,8 @@
 import { _decorator, Component, director, EditBoxComponent, Node } from 'cc';
 const { ccclass, property } = _decorator;
 
+const MAX_JEWEL_NUMBER = 5
+
 @ccclass('ConfigController')
 export class ConfigController extends Component {
     @property(EditBoxComponent)
@@ -40,7 +42,7 @@ export class ConfigController extends Component {
     }
     private onColorsInputEnd() {
         if (this.ColorsInput) {
-            this.colors = parseInt(this.ColorsInput.string)
+            this.colors = Math.min(MAX_JEWEL_NUMBER, parseInt(this.ColorsInput.string))
         }
     }
     public startGame() {

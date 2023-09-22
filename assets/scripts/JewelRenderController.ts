@@ -32,7 +32,7 @@ export class JewelRenderController extends Component {
 
     private initField() {
         this.field.getComponent(UITransform)
-            .setContentSize(new Size(this.H * SPRITE_SIZE + 32, this.W * SPRITE_SIZE + 32))
+            .setContentSize(new Size(this.W * SPRITE_SIZE + 32, this.H * SPRITE_SIZE + 32))
     }
 
     private getEmptyJewelNodes() {

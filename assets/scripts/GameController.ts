@@ -1,7 +1,7 @@
-import { _decorator, Component, director, EditBox, find, Label, Node } from 'cc'
+import { _decorator, Button, Component, director, EditBox, find, Label, Node } from 'cc'
 import { JewelRenderController } from './JewelRenderController'
 import { ConfigController } from './ConfigController'
-import { JewelsMatrix } from './JewelsMatrix'
+import { JewelsMatrix, TMatrixDiff } from './JewelsMatrix'
 import { GameOverController } from './GameOverController'
 const { ccclass, property } = _decorator
 
@@ -17,17 +17,25 @@ export class GameController extends Component {
     protected pointsLabel: Label = null
     @property(Label)
     protected movesLabel: Label = null
+    @property(Label)
+    protected bombLabel: Label = null
+    @property(Label)
+    protected bombActivatedLabel: Label = null
+    @property(Number)
+    protected bombRadius: number = 3
+    @property(Number)
+    protected bombNumber: number = 1
     @property(Number)
     protected maxMovesNumber: number = 15
-    @property(Number)
-    protected pointsToWin: number = 300
     @property(Number)
     protected colorNumber: number = 5
     @property(Number)
     protected shuffleCount: number = 2
-
+    
+    protected pointsToWin: number = 300
     private jewelMatrix: JewelsMatrix = null
     private moves: number = 0
+    private bombActivated: boolean = false
 
     private count: number = 0
 
@@ -38,8 +46,10 @@ export class GameController extends Component {
         const h = configController.getHeight()
         const w = configController.getWidth()
         this.colorNumber = configController.getColorNumber()
+        this.pointsToWin = Math.floor(h * w * 10 / (Math.pow(this.colorNumber, 4) / 125))
         this.updatePoints()
         this.updateMoves()
+        this.updateBomb()
         this.jewelMatrix = new JewelsMatrix(h, w, this.colorNumber, MIN_CONNECTED)
         this.jewelRenderController.init(this, this.jewelMatrix.getMatrix(), h, w)
     }
@@ -50,16 +60,31 @@ export class GameController extends Component {
         this.updatePoints()
     }
 
+    public addMove() {
+        this.moves += 1
+        this.updateMoves()
+    }
+
     public async popJewel(row: number, col: number) {
-        const diff = this.jewelMatrix.popJewel(row, col)
+        let diff: TMatrixDiff | null = null
+        if (this.bombActivated) {
+            diff = this.jewelMatrix.popInRadius(row, col, this.bombRadius)
+            this.bombNumber -= this.bombNumber
+            this.updateBomb()
+        } else {
+            diff = this.jewelMatrix.popJewel(row, col)
+        }
         if (diff) {
-            this.moves += 1
-            this.updateMoves()
-            this.addPoints(diff.poped.length)
-            this.checkIfWinOrLose()
+            this.addMove()
+            if (!this.bombActivated) {
+                this.addPoints(diff.poped.length)
+            }
             await this.jewelRenderController.updateMatrix(diff)
             await this.fixIfNotSolvable()
+            this.checkIfWinOrLose()
         }
+        this.bombActivated = false
+        this.updateBombActivated()
         return diff
     }
 
@@ -71,11 +96,22 @@ export class GameController extends Component {
         this.movesLabel.string = `${this.maxMovesNumber - this.moves}`
     }
 
+    private updateBomb() {
+        this.bombLabel.string = `${this.bombNumber}`
+    }
+
+    private updateBombActivated() {
+        this.bombActivatedLabel.enabled = this.bombActivated
+    }
+
     private async fixIfNotSolvable() {
         let count = 0
         while (count < this.shuffleCount && !this.jewelMatrix.isSolvable()) {
             await this.jewelRenderController.updateMatrix(this.jewelMatrix.shuffle())
             count++
+        }
+        if (!this.jewelMatrix.isSolvable()) {
+            this.loadLoseScreen()
         }
     }
 
@@ -84,6 +120,13 @@ export class GameController extends Component {
             this.loadWonScreen()
         } else if (this.moves >= this.maxMovesNumber) {
             this.loadLoseScreen()
+        }
+    }
+
+    public toggleBomb() {
+        if (this.bombNumber) {
+            this.bombActivated = !this.bombActivated
+            this.updateBombActivated()
         }
     }
 
